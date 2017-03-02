@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.web.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/web-project/3">
-            <name>EveryDayIsAGoodDay</name>
+            <name>EverydayIsAGoodDay</name>
             <minimum-ant-version>1.6.5</minimum-ant-version>
             <web-module-libraries>
                 <library dirs="200">
@@ -25,13 +25,13 @@
         </data>
         <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
             <config-files>
-                <config-file>web/WEB-INF/applicationContext.xml</config-file>
-                <config-file>web/WEB-INF/dispatcher-servlet.xml</config-file>
+                <config-file>../EveryDayIsAGoodDay/web/WEB-INF/applicationContext.xml</config-file>
+                <config-file>../EveryDayIsAGoodDay/web/WEB-INF/dispatcher-servlet.xml</config-file>
             </config-files>
             <config-file-groups>
                 <config-file-group name="Default Group">
-                    <config-file>web/WEB-INF/applicationContext.xml</config-file>
-                    <config-file>web/WEB-INF/dispatcher-servlet.xml</config-file>
+                    <config-file>../EveryDayIsAGoodDay/web/WEB-INF/applicationContext.xml</config-file>
+                    <config-file>../EveryDayIsAGoodDay/web/WEB-INF/dispatcher-servlet.xml</config-file>
                 </config-file-group>
             </config-file-groups>
         </spring-data>
