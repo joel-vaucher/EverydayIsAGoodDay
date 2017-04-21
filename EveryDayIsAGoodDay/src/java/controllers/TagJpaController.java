@@ -5,8 +5,8 @@
  */
 package controllers;
 
+import controllers.exceptions.IllegalOrphanException;
 import controllers.exceptions.NonexistentEntityException;
-import controllers.exceptions.PreexistingEntityException;
 import controllers.exceptions.RollbackFailureException;
 import java.io.Serializable;
 import javax.persistence.Query;
@@ -39,7 +39,7 @@ public class TagJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Tag tag) throws PreexistingEntityException, RollbackFailureException, Exception {
+    public void create(Tag tag) throws RollbackFailureException, Exception {
         if (tag.getResolutionCollection() == null) {
             tag.setResolutionCollection(new ArrayList<Resolution>());
         }
@@ -55,8 +55,13 @@ public class TagJpaController implements Serializable {
             tag.setResolutionCollection(attachedResolutionCollection);
             em.persist(tag);
             for (Resolution resolutionCollectionResolution : tag.getResolutionCollection()) {
-                resolutionCollectionResolution.getTagCollection().add(tag);
+                Tag oldTagidTagOfResolutionCollectionResolution = resolutionCollectionResolution.getTagidTag();
+                resolutionCollectionResolution.setTagidTag(tag);
                 resolutionCollectionResolution = em.merge(resolutionCollectionResolution);
+                if (oldTagidTagOfResolutionCollectionResolution != null) {
+                    oldTagidTagOfResolutionCollectionResolution.getResolutionCollection().remove(resolutionCollectionResolution);
+                    oldTagidTagOfResolutionCollectionResolution = em.merge(oldTagidTagOfResolutionCollectionResolution);
+                }
             }
             utx.commit();
         } catch (Exception ex) {
@@ -64,9 +69,6 @@ public class TagJpaController implements Serializable {
                 utx.rollback();
             } catch (Exception re) {
                 throw new RollbackFailureException("An error occurred attempting to roll back the transaction.", re);
-            }
-            if (findTag(tag.getIdTag()) != null) {
-                throw new PreexistingEntityException("Tag " + tag + " already exists.", ex);
             }
             throw ex;
         } finally {
@@ -76,7 +78,7 @@ public class TagJpaController implements Serializable {
         }
     }
 
-    public void edit(Tag tag) throws NonexistentEntityException, RollbackFailureException, Exception {
+    public void edit(Tag tag) throws IllegalOrphanException, NonexistentEntityException, RollbackFailureException, Exception {
         EntityManager em = null;
         try {
             utx.begin();
@@ -84,6 +86,18 @@ public class TagJpaController implements Serializable {
             Tag persistentTag = em.find(Tag.class, tag.getIdTag());
             Collection<Resolution> resolutionCollectionOld = persistentTag.getResolutionCollection();
             Collection<Resolution> resolutionCollectionNew = tag.getResolutionCollection();
+            List<String> illegalOrphanMessages = null;
+            for (Resolution resolutionCollectionOldResolution : resolutionCollectionOld) {
+                if (!resolutionCollectionNew.contains(resolutionCollectionOldResolution)) {
+                    if (illegalOrphanMessages == null) {
+                        illegalOrphanMessages = new ArrayList<String>();
+                    }
+                    illegalOrphanMessages.add("You must retain Resolution " + resolutionCollectionOldResolution + " since its tagidTag field is not nullable.");
+                }
+            }
+            if (illegalOrphanMessages != null) {
+                throw new IllegalOrphanException(illegalOrphanMessages);
+            }
             Collection<Resolution> attachedResolutionCollectionNew = new ArrayList<Resolution>();
             for (Resolution resolutionCollectionNewResolutionToAttach : resolutionCollectionNew) {
                 resolutionCollectionNewResolutionToAttach = em.getReference(resolutionCollectionNewResolutionToAttach.getClass(), resolutionCollectionNewResolutionToAttach.getIdResolution());
@@ -92,16 +106,15 @@ public class TagJpaController implements Serializable {
             resolutionCollectionNew = attachedResolutionCollectionNew;
             tag.setResolutionCollection(resolutionCollectionNew);
             tag = em.merge(tag);
-            for (Resolution resolutionCollectionOldResolution : resolutionCollectionOld) {
-                if (!resolutionCollectionNew.contains(resolutionCollectionOldResolution)) {
-                    resolutionCollectionOldResolution.getTagCollection().remove(tag);
-                    resolutionCollectionOldResolution = em.merge(resolutionCollectionOldResolution);
-                }
-            }
             for (Resolution resolutionCollectionNewResolution : resolutionCollectionNew) {
                 if (!resolutionCollectionOld.contains(resolutionCollectionNewResolution)) {
-                    resolutionCollectionNewResolution.getTagCollection().add(tag);
+                    Tag oldTagidTagOfResolutionCollectionNewResolution = resolutionCollectionNewResolution.getTagidTag();
+                    resolutionCollectionNewResolution.setTagidTag(tag);
                     resolutionCollectionNewResolution = em.merge(resolutionCollectionNewResolution);
+                    if (oldTagidTagOfResolutionCollectionNewResolution != null && !oldTagidTagOfResolutionCollectionNewResolution.equals(tag)) {
+                        oldTagidTagOfResolutionCollectionNewResolution.getResolutionCollection().remove(resolutionCollectionNewResolution);
+                        oldTagidTagOfResolutionCollectionNewResolution = em.merge(oldTagidTagOfResolutionCollectionNewResolution);
+                    }
                 }
             }
             utx.commit();
@@ -126,7 +139,7 @@ public class TagJpaController implements Serializable {
         }
     }
 
-    public void destroy(Integer id) throws NonexistentEntityException, RollbackFailureException, Exception {
+    public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException, RollbackFailureException, Exception {
         EntityManager em = null;
         try {
             utx.begin();
@@ -138,10 +151,16 @@ public class TagJpaController implements Serializable {
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The tag with id " + id + " no longer exists.", enfe);
             }
-            Collection<Resolution> resolutionCollection = tag.getResolutionCollection();
-            for (Resolution resolutionCollectionResolution : resolutionCollection) {
-                resolutionCollectionResolution.getTagCollection().remove(tag);
-                resolutionCollectionResolution = em.merge(resolutionCollectionResolution);
+            List<String> illegalOrphanMessages = null;
+            Collection<Resolution> resolutionCollectionOrphanCheck = tag.getResolutionCollection();
+            for (Resolution resolutionCollectionOrphanCheckResolution : resolutionCollectionOrphanCheck) {
+                if (illegalOrphanMessages == null) {
+                    illegalOrphanMessages = new ArrayList<String>();
+                }
+                illegalOrphanMessages.add("This Tag (" + tag + ") cannot be destroyed since the Resolution " + resolutionCollectionOrphanCheckResolution + " in its resolutionCollection field has a non-nullable tagidTag field.");
+            }
+            if (illegalOrphanMessages != null) {
+                throw new IllegalOrphanException(illegalOrphanMessages);
             }
             em.remove(tag);
             utx.commit();

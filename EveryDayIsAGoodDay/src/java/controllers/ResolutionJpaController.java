@@ -7,7 +7,6 @@ package controllers;
 
 import controllers.exceptions.IllegalOrphanException;
 import controllers.exceptions.NonexistentEntityException;
-import controllers.exceptions.PreexistingEntityException;
 import controllers.exceptions.RollbackFailureException;
 import entities.Resolution;
 import java.io.Serializable;
@@ -15,11 +14,11 @@ import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import entities.User;
 import entities.Tag;
+import entities.User;
+import entities.Validation;
 import java.util.ArrayList;
 import java.util.Collection;
-import entities.Validation;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -42,10 +41,7 @@ public class ResolutionJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Resolution resolution) throws PreexistingEntityException, RollbackFailureException, Exception {
-        if (resolution.getTagCollection() == null) {
-            resolution.setTagCollection(new ArrayList<Tag>());
-        }
+    public void create(Resolution resolution) throws RollbackFailureException, Exception {
         if (resolution.getValidationCollection() == null) {
             resolution.setValidationCollection(new ArrayList<Validation>());
         }
@@ -53,39 +49,38 @@ public class ResolutionJpaController implements Serializable {
         try {
             utx.begin();
             em = getEntityManager();
+            Tag tagidTag = resolution.getTagidTag();
+            if (tagidTag != null) {
+                tagidTag = em.getReference(tagidTag.getClass(), tagidTag.getIdTag());
+                resolution.setTagidTag(tagidTag);
+            }
             User useridUser = resolution.getUseridUser();
             if (useridUser != null) {
                 useridUser = em.getReference(useridUser.getClass(), useridUser.getIdUser());
                 resolution.setUseridUser(useridUser);
             }
-            Collection<Tag> attachedTagCollection = new ArrayList<Tag>();
-            for (Tag tagCollectionTagToAttach : resolution.getTagCollection()) {
-                tagCollectionTagToAttach = em.getReference(tagCollectionTagToAttach.getClass(), tagCollectionTagToAttach.getIdTag());
-                attachedTagCollection.add(tagCollectionTagToAttach);
-            }
-            resolution.setTagCollection(attachedTagCollection);
             Collection<Validation> attachedValidationCollection = new ArrayList<Validation>();
             for (Validation validationCollectionValidationToAttach : resolution.getValidationCollection()) {
-                validationCollectionValidationToAttach = em.getReference(validationCollectionValidationToAttach.getClass(), validationCollectionValidationToAttach.getValidationPK());
+                validationCollectionValidationToAttach = em.getReference(validationCollectionValidationToAttach.getClass(), validationCollectionValidationToAttach.getIdValidation());
                 attachedValidationCollection.add(validationCollectionValidationToAttach);
             }
             resolution.setValidationCollection(attachedValidationCollection);
             em.persist(resolution);
+            if (tagidTag != null) {
+                tagidTag.getResolutionCollection().add(resolution);
+                tagidTag = em.merge(tagidTag);
+            }
             if (useridUser != null) {
                 useridUser.getResolutionCollection().add(resolution);
                 useridUser = em.merge(useridUser);
             }
-            for (Tag tagCollectionTag : resolution.getTagCollection()) {
-                tagCollectionTag.getResolutionCollection().add(resolution);
-                tagCollectionTag = em.merge(tagCollectionTag);
-            }
             for (Validation validationCollectionValidation : resolution.getValidationCollection()) {
-                Resolution oldResolutionOfValidationCollectionValidation = validationCollectionValidation.getResolution();
-                validationCollectionValidation.setResolution(resolution);
+                Resolution oldResolutionidResolutionOfValidationCollectionValidation = validationCollectionValidation.getResolutionidResolution();
+                validationCollectionValidation.setResolutionidResolution(resolution);
                 validationCollectionValidation = em.merge(validationCollectionValidation);
-                if (oldResolutionOfValidationCollectionValidation != null) {
-                    oldResolutionOfValidationCollectionValidation.getValidationCollection().remove(validationCollectionValidation);
-                    oldResolutionOfValidationCollectionValidation = em.merge(oldResolutionOfValidationCollectionValidation);
+                if (oldResolutionidResolutionOfValidationCollectionValidation != null) {
+                    oldResolutionidResolutionOfValidationCollectionValidation.getValidationCollection().remove(validationCollectionValidation);
+                    oldResolutionidResolutionOfValidationCollectionValidation = em.merge(oldResolutionidResolutionOfValidationCollectionValidation);
                 }
             }
             utx.commit();
@@ -94,9 +89,6 @@ public class ResolutionJpaController implements Serializable {
                 utx.rollback();
             } catch (Exception re) {
                 throw new RollbackFailureException("An error occurred attempting to roll back the transaction.", re);
-            }
-            if (findResolution(resolution.getIdResolution()) != null) {
-                throw new PreexistingEntityException("Resolution " + resolution + " already exists.", ex);
             }
             throw ex;
         } finally {
@@ -112,10 +104,10 @@ public class ResolutionJpaController implements Serializable {
             utx.begin();
             em = getEntityManager();
             Resolution persistentResolution = em.find(Resolution.class, resolution.getIdResolution());
+            Tag tagidTagOld = persistentResolution.getTagidTag();
+            Tag tagidTagNew = resolution.getTagidTag();
             User useridUserOld = persistentResolution.getUseridUser();
             User useridUserNew = resolution.getUseridUser();
-            Collection<Tag> tagCollectionOld = persistentResolution.getTagCollection();
-            Collection<Tag> tagCollectionNew = resolution.getTagCollection();
             Collection<Validation> validationCollectionOld = persistentResolution.getValidationCollection();
             Collection<Validation> validationCollectionNew = resolution.getValidationCollection();
             List<String> illegalOrphanMessages = null;
@@ -124,31 +116,36 @@ public class ResolutionJpaController implements Serializable {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain Validation " + validationCollectionOldValidation + " since its resolution field is not nullable.");
+                    illegalOrphanMessages.add("You must retain Validation " + validationCollectionOldValidation + " since its resolutionidResolution field is not nullable.");
                 }
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
             }
+            if (tagidTagNew != null) {
+                tagidTagNew = em.getReference(tagidTagNew.getClass(), tagidTagNew.getIdTag());
+                resolution.setTagidTag(tagidTagNew);
+            }
             if (useridUserNew != null) {
                 useridUserNew = em.getReference(useridUserNew.getClass(), useridUserNew.getIdUser());
                 resolution.setUseridUser(useridUserNew);
             }
-            Collection<Tag> attachedTagCollectionNew = new ArrayList<Tag>();
-            for (Tag tagCollectionNewTagToAttach : tagCollectionNew) {
-                tagCollectionNewTagToAttach = em.getReference(tagCollectionNewTagToAttach.getClass(), tagCollectionNewTagToAttach.getIdTag());
-                attachedTagCollectionNew.add(tagCollectionNewTagToAttach);
-            }
-            tagCollectionNew = attachedTagCollectionNew;
-            resolution.setTagCollection(tagCollectionNew);
             Collection<Validation> attachedValidationCollectionNew = new ArrayList<Validation>();
             for (Validation validationCollectionNewValidationToAttach : validationCollectionNew) {
-                validationCollectionNewValidationToAttach = em.getReference(validationCollectionNewValidationToAttach.getClass(), validationCollectionNewValidationToAttach.getValidationPK());
+                validationCollectionNewValidationToAttach = em.getReference(validationCollectionNewValidationToAttach.getClass(), validationCollectionNewValidationToAttach.getIdValidation());
                 attachedValidationCollectionNew.add(validationCollectionNewValidationToAttach);
             }
             validationCollectionNew = attachedValidationCollectionNew;
             resolution.setValidationCollection(validationCollectionNew);
             resolution = em.merge(resolution);
+            if (tagidTagOld != null && !tagidTagOld.equals(tagidTagNew)) {
+                tagidTagOld.getResolutionCollection().remove(resolution);
+                tagidTagOld = em.merge(tagidTagOld);
+            }
+            if (tagidTagNew != null && !tagidTagNew.equals(tagidTagOld)) {
+                tagidTagNew.getResolutionCollection().add(resolution);
+                tagidTagNew = em.merge(tagidTagNew);
+            }
             if (useridUserOld != null && !useridUserOld.equals(useridUserNew)) {
                 useridUserOld.getResolutionCollection().remove(resolution);
                 useridUserOld = em.merge(useridUserOld);
@@ -157,26 +154,14 @@ public class ResolutionJpaController implements Serializable {
                 useridUserNew.getResolutionCollection().add(resolution);
                 useridUserNew = em.merge(useridUserNew);
             }
-            for (Tag tagCollectionOldTag : tagCollectionOld) {
-                if (!tagCollectionNew.contains(tagCollectionOldTag)) {
-                    tagCollectionOldTag.getResolutionCollection().remove(resolution);
-                    tagCollectionOldTag = em.merge(tagCollectionOldTag);
-                }
-            }
-            for (Tag tagCollectionNewTag : tagCollectionNew) {
-                if (!tagCollectionOld.contains(tagCollectionNewTag)) {
-                    tagCollectionNewTag.getResolutionCollection().add(resolution);
-                    tagCollectionNewTag = em.merge(tagCollectionNewTag);
-                }
-            }
             for (Validation validationCollectionNewValidation : validationCollectionNew) {
                 if (!validationCollectionOld.contains(validationCollectionNewValidation)) {
-                    Resolution oldResolutionOfValidationCollectionNewValidation = validationCollectionNewValidation.getResolution();
-                    validationCollectionNewValidation.setResolution(resolution);
+                    Resolution oldResolutionidResolutionOfValidationCollectionNewValidation = validationCollectionNewValidation.getResolutionidResolution();
+                    validationCollectionNewValidation.setResolutionidResolution(resolution);
                     validationCollectionNewValidation = em.merge(validationCollectionNewValidation);
-                    if (oldResolutionOfValidationCollectionNewValidation != null && !oldResolutionOfValidationCollectionNewValidation.equals(resolution)) {
-                        oldResolutionOfValidationCollectionNewValidation.getValidationCollection().remove(validationCollectionNewValidation);
-                        oldResolutionOfValidationCollectionNewValidation = em.merge(oldResolutionOfValidationCollectionNewValidation);
+                    if (oldResolutionidResolutionOfValidationCollectionNewValidation != null && !oldResolutionidResolutionOfValidationCollectionNewValidation.equals(resolution)) {
+                        oldResolutionidResolutionOfValidationCollectionNewValidation.getValidationCollection().remove(validationCollectionNewValidation);
+                        oldResolutionidResolutionOfValidationCollectionNewValidation = em.merge(oldResolutionidResolutionOfValidationCollectionNewValidation);
                     }
                 }
             }
@@ -220,20 +205,20 @@ public class ResolutionJpaController implements Serializable {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This Resolution (" + resolution + ") cannot be destroyed since the Validation " + validationCollectionOrphanCheckValidation + " in its validationCollection field has a non-nullable resolution field.");
+                illegalOrphanMessages.add("This Resolution (" + resolution + ") cannot be destroyed since the Validation " + validationCollectionOrphanCheckValidation + " in its validationCollection field has a non-nullable resolutionidResolution field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
+            }
+            Tag tagidTag = resolution.getTagidTag();
+            if (tagidTag != null) {
+                tagidTag.getResolutionCollection().remove(resolution);
+                tagidTag = em.merge(tagidTag);
             }
             User useridUser = resolution.getUseridUser();
             if (useridUser != null) {
                 useridUser.getResolutionCollection().remove(resolution);
                 useridUser = em.merge(useridUser);
-            }
-            Collection<Tag> tagCollection = resolution.getTagCollection();
-            for (Tag tagCollectionTag : tagCollection) {
-                tagCollectionTag.getResolutionCollection().remove(resolution);
-                tagCollectionTag = em.merge(tagCollectionTag);
             }
             em.remove(resolution);
             utx.commit();

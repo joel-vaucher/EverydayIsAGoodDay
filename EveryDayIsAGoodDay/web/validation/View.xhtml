@@ -15,12 +15,14 @@
             </h:panelGroup>
             <h:form>
                 <h:panelGrid columns="2">
-                    <h:outputText value="#{bundle.ViewValidationLabel_validationPK_day}"/>
-                    <h:outputText value="#{validationController.selected.validationPK.day}" title="#{bundle.ViewValidationTitle_validationPK_day}">
+                    <h:outputText value="#{bundle.ViewValidationLabel_idValidation}"/>
+                    <h:outputText value="#{validationController.selected.idValidation}" title="#{bundle.ViewValidationTitle_idValidation}"/>
+                    <h:outputText value="#{bundle.ViewValidationLabel_day}"/>
+                    <h:outputText value="#{validationController.selected.day}" title="#{bundle.ViewValidationTitle_day}">
                         <f:convertDateTime pattern="MM/dd/yyyy" />
                     </h:outputText>
-                    <h:outputText value="#{bundle.ViewValidationLabel_resolution}"/>
-                    <h:outputText value="#{validationController.selected.resolution}" title="#{bundle.ViewValidationTitle_resolution}"/>
+                    <h:outputText value="#{bundle.ViewValidationLabel_resolutionidResolution}"/>
+                    <h:outputText value="#{validationController.selected.resolutionidResolution}" title="#{bundle.ViewValidationTitle_resolutionidResolution}"/>
                 </h:panelGrid>
                 <br />
                 <h:commandLink action="#{validationController.destroyAndView}" value="#{bundle.ViewValidationDestroyLink}"/>

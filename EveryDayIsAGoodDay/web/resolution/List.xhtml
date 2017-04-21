@@ -10,60 +10,64 @@
             <h:outputText value="#{bundle.ListResolutionTitle}"></h:outputText>
         </ui:define>
         <ui:define name="body">
-            <h:form styleClass="jsfcrud_list_form">
-                <h:panelGroup id="messagePanel" layout="block">
-                    <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
-                </h:panelGroup>
-                <h:outputText escape="false" value="#{bundle.ListResolutionEmpty}" rendered="#{resolutionController.items.rowCount == 0}"/>
-                <h:panelGroup rendered="#{resolutionController.items.rowCount > 0}">
-                    <h:outputText value="#{resolutionController.pagination.pageFirstItem + 1}..#{resolutionController.pagination.pageLastItem + 1}/#{resolutionController.pagination.itemsCount}"/>&nbsp;
-                    <h:commandLink action="#{resolutionController.previous}" value="#{bundle.Previous} #{resolutionController.pagination.pageSize}" rendered="#{resolutionController.pagination.hasPreviousPage}"/>&nbsp;
-                    <h:commandLink action="#{resolutionController.next}" value="#{bundle.Next} #{resolutionController.pagination.pageSize}" rendered="#{resolutionController.pagination.hasNextPage}"/>&nbsp;
-                    <h:dataTable value="#{resolutionController.items}" var="item" border="0" cellpadding="2" cellspacing="0" rowClasses="jsfcrud_odd_row,jsfcrud_even_row" rules="all" style="border:solid 1px">
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{bundle.ListResolutionTitle_idResolution}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.idResolution}"/>
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{bundle.ListResolutionTitle_description}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.description}"/>
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{bundle.ListResolutionTitle_year}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.year}">
-                                <f:convertDateTime pattern="MM/dd/yyyy" />
-                            </h:outputText>
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{bundle.ListResolutionTitle_useridUser}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.useridUser}"/>
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="&nbsp;"/>
-                            </f:facet>
-                            <h:commandLink action="#{resolutionController.prepareView}" value="#{bundle.ListResolutionViewLink}"/>
-                            <h:outputText value=" "/>
-                            <h:commandLink action="#{resolutionController.prepareEdit}" value="#{bundle.ListResolutionEditLink}"/>
-                            <h:outputText value=" "/>
-                            <h:commandLink action="#{resolutionController.destroy}" value="#{bundle.ListResolutionDestroyLink}"/>
-                        </h:column>
-                    </h:dataTable>
-                </h:panelGroup>
-                <br />
-                <h:commandLink action="#{resolutionController.prepareCreate}" value="#{bundle.ListResolutionCreateLink}"/>
-                <br />
-                <br />
-                <h:link outcome="/index" value="#{bundle.ListResolutionIndexLink}"/>
-            </h:form>
+        <h:form styleClass="jsfcrud_list_form">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:outputText escape="false" value="#{bundle.ListResolutionEmpty}" rendered="#{resolutionController.items.rowCount == 0}"/>
+            <h:panelGroup rendered="#{resolutionController.items.rowCount > 0}">
+                <h:outputText value="#{resolutionController.pagination.pageFirstItem + 1}..#{resolutionController.pagination.pageLastItem + 1}/#{resolutionController.pagination.itemsCount}"/>&nbsp;
+                <h:commandLink action="#{resolutionController.previous}" value="#{bundle.Previous} #{resolutionController.pagination.pageSize}" rendered="#{resolutionController.pagination.hasPreviousPage}"/>&nbsp;
+                <h:commandLink action="#{resolutionController.next}" value="#{bundle.Next} #{resolutionController.pagination.pageSize}" rendered="#{resolutionController.pagination.hasNextPage}"/>&nbsp;
+                <h:dataTable value="#{resolutionController.items}" var="item" border="0" cellpadding="2" cellspacing="0" rowClasses="jsfcrud_odd_row,jsfcrud_even_row" rules="all" style="border:solid 1px">
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle.ListResolutionTitle_idResolution}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idResolution}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle.ListResolutionTitle_description}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.description}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle.ListResolutionTitle_year}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.year}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle.ListResolutionTitle_tagidTag}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.tagidTag}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle.ListResolutionTitle_useridUser}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.useridUser}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;"/>
+                        </f:facet>
+                        <h:commandLink action="#{resolutionController.prepareView}" value="#{bundle.ListResolutionViewLink}"/>
+                        <h:outputText value=" "/>
+                        <h:commandLink action="#{resolutionController.prepareEdit}" value="#{bundle.ListResolutionEditLink}"/>
+                        <h:outputText value=" "/>
+                        <h:commandLink action="#{resolutionController.destroy}" value="#{bundle.ListResolutionDestroyLink}"/>
+                    </h:column>
+                </h:dataTable>
+            </h:panelGroup>
+            <br />
+            <h:commandLink action="#{resolutionController.prepareCreate}" value="#{bundle.ListResolutionCreateLink}"/>
+            <br />
+            <br />
+            <h:link outcome="/index" value="#{bundle.ListResolutionIndexLink}"/>
+        </h:form>
         </ui:define>
     </ui:composition>
 

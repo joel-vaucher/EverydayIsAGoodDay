@@ -7,13 +7,20 @@ package entities;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.EmbeddedId;
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -25,48 +32,65 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Validation.findAll", query = "SELECT v FROM Validation v"),
-    @NamedQuery(name = "Validation.findByDay", query = "SELECT v FROM Validation v WHERE v.validationPK.day = :day"),
-    @NamedQuery(name = "Validation.findByResolutionidResolution", query = "SELECT v FROM Validation v WHERE v.validationPK.resolutionidResolution = :resolutionidResolution")})
+    @NamedQuery(name = "Validation.findByIdValidation", query = "SELECT v FROM Validation v WHERE v.idValidation = :idValidation"),
+    @NamedQuery(name = "Validation.findByDay", query = "SELECT v FROM Validation v WHERE v.day = :day")})
 public class Validation implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @EmbeddedId
-    protected ValidationPK validationPK;
-    @JoinColumn(name = "Resolution_idResolution", referencedColumnName = "idResolution", insertable = false, updatable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "idValidation")
+    private Integer idValidation;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "day")
+    @Temporal(TemporalType.DATE)
+    private Date day;
+    @JoinColumn(name = "Resolution_idResolution", referencedColumnName = "idResolution")
     @ManyToOne(optional = false)
-    private Resolution resolution;
+    private Resolution resolutionidResolution;
 
     public Validation() {
     }
 
-    public Validation(ValidationPK validationPK) {
-        this.validationPK = validationPK;
+    public Validation(Integer idValidation) {
+        this.idValidation = idValidation;
     }
 
-    public Validation(Date day, int resolutionidResolution) {
-        this.validationPK = new ValidationPK(day, resolutionidResolution);
+    public Validation(Integer idValidation, Date day) {
+        this.idValidation = idValidation;
+        this.day = day;
     }
 
-    public ValidationPK getValidationPK() {
-        return validationPK;
+    public Integer getIdValidation() {
+        return idValidation;
     }
 
-    public void setValidationPK(ValidationPK validationPK) {
-        this.validationPK = validationPK;
+    public void setIdValidation(Integer idValidation) {
+        this.idValidation = idValidation;
     }
 
-    public Resolution getResolution() {
-        return resolution;
+    public Date getDay() {
+        return day;
     }
 
-    public void setResolution(Resolution resolution) {
-        this.resolution = resolution;
+    public void setDay(Date day) {
+        this.day = day;
+    }
+
+    public Resolution getResolutionidResolution() {
+        return resolutionidResolution;
+    }
+
+    public void setResolutionidResolution(Resolution resolutionidResolution) {
+        this.resolutionidResolution = resolutionidResolution;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (validationPK != null ? validationPK.hashCode() : 0);
+        hash += (idValidation != null ? idValidation.hashCode() : 0);
         return hash;
     }
 
@@ -77,7 +101,7 @@ public class Validation implements Serializable {
             return false;
         }
         Validation other = (Validation) object;
-        if ((this.validationPK == null && other.validationPK != null) || (this.validationPK != null && !this.validationPK.equals(other.validationPK))) {
+        if ((this.idValidation == null && other.idValidation != null) || (this.idValidation != null && !this.idValidation.equals(other.idValidation))) {
             return false;
         }
         return true;
@@ -85,7 +109,7 @@ public class Validation implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.Validation[ validationPK=" + validationPK + " ]";
+        return "entities.Validation[ idValidation=" + idValidation + " ]";
     }
     
 }

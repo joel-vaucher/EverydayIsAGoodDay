@@ -35,7 +35,6 @@ public class ValidationController implements Serializable {
     public Validation getSelected() {
         if (current == null) {
             current = new Validation();
-            current.setValidationPK(new entities.ValidationPK());
             selectedItemIndex = -1;
         }
         return current;
@@ -76,14 +75,12 @@ public class ValidationController implements Serializable {
 
     public String prepareCreate() {
         current = new Validation();
-        current.setValidationPK(new entities.ValidationPK());
         selectedItemIndex = -1;
         return "Create";
     }
 
     public String create() {
         try {
-            current.getValidationPK().setResolutionidResolution(current.getResolution().getIdResolution());
             getFacade().create(current);
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("ValidationCreated"));
             return prepareCreate();
@@ -101,7 +98,6 @@ public class ValidationController implements Serializable {
 
     public String update() {
         try {
-            current.getValidationPK().setResolutionidResolution(current.getResolution().getIdResolution());
             getFacade().edit(current);
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("ValidationUpdated"));
             return "View";
@@ -192,15 +188,12 @@ public class ValidationController implements Serializable {
         return JsfUtil.getSelectItems(ejbFacade.findAll(), true);
     }
 
-    public Validation getValidation(entities.ValidationPK id) {
+    public Validation getValidation(java.lang.Integer id) {
         return ejbFacade.find(id);
     }
 
     @FacesConverter(forClass = Validation.class)
     public static class ValidationControllerConverter implements Converter {
-
-        private static final String SEPARATOR = "#";
-        private static final String SEPARATOR_ESCAPED = "\\#";
 
         @Override
         public Object getAsObject(FacesContext facesContext, UIComponent component, String value) {
@@ -212,20 +205,15 @@ public class ValidationController implements Serializable {
             return controller.getValidation(getKey(value));
         }
 
-        entities.ValidationPK getKey(String value) {
-            entities.ValidationPK key;
-            String values[] = value.split(SEPARATOR_ESCAPED);
-            key = new entities.ValidationPK();
-            key.setDay(java.sql.Date.valueOf(values[0]));
-            key.setResolutionidResolution(Integer.parseInt(values[1]));
+        java.lang.Integer getKey(String value) {
+            java.lang.Integer key;
+            key = Integer.valueOf(value);
             return key;
         }
 
-        String getStringKey(entities.ValidationPK value) {
+        String getStringKey(java.lang.Integer value) {
             StringBuilder sb = new StringBuilder();
-            sb.append(value.getDay());
-            sb.append(SEPARATOR);
-            sb.append(value.getResolutionidResolution());
+            sb.append(value);
             return sb.toString();
         }
 
@@ -236,7 +224,7 @@ public class ValidationController implements Serializable {
             }
             if (object instanceof Validation) {
                 Validation o = (Validation) object;
-                return getStringKey(o.getValidationPK());
+                return getStringKey(o.getIdValidation());
             } else {
                 throw new IllegalArgumentException("object " + object + " is of type " + object.getClass().getName() + "; expected type: " + Validation.class.getName());
             }

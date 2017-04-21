@@ -15,14 +15,14 @@
             </h:panelGroup>
             <h:form>
                 <h:panelGrid columns="2">
-                    <h:outputLabel value="#{bundle.EditResolutionLabel_idResolution}" for="idResolution" />
-                    <h:inputText id="idResolution" value="#{resolutionController.selected.idResolution}" title="#{bundle.EditResolutionTitle_idResolution}" required="true" requiredMessage="#{bundle.EditResolutionRequiredMessage_idResolution}"/>
                     <h:outputLabel value="#{bundle.EditResolutionLabel_description}" for="description" />
                     <h:inputText id="description" value="#{resolutionController.selected.description}" title="#{bundle.EditResolutionTitle_description}" />
                     <h:outputLabel value="#{bundle.EditResolutionLabel_year}" for="year" />
-                    <h:inputText id="year" value="#{resolutionController.selected.year}" title="#{bundle.EditResolutionTitle_year}" >
-                        <f:convertDateTime pattern="MM/dd/yyyy" />
-                    </h:inputText>
+                    <h:inputText id="year" value="#{resolutionController.selected.year}" title="#{bundle.EditResolutionTitle_year}" />
+                    <h:outputLabel value="#{bundle.EditResolutionLabel_tagidTag}" for="tagidTag" />
+                    <h:selectOneMenu id="tagidTag" value="#{resolutionController.selected.tagidTag}" title="#{bundle.EditResolutionTitle_tagidTag}" required="true" requiredMessage="#{bundle.EditResolutionRequiredMessage_tagidTag}">
+                        <f:selectItems value="#{tagController.itemsAvailableSelectOne}"/>
+                    </h:selectOneMenu>
                     <h:outputLabel value="#{bundle.EditResolutionLabel_useridUser}" for="useridUser" />
                     <h:selectOneMenu id="useridUser" value="#{resolutionController.selected.useridUser}" title="#{bundle.EditResolutionTitle_useridUser}" required="true" requiredMessage="#{bundle.EditResolutionRequiredMessage_useridUser}">
                         <f:selectItems value="#{userController.itemsAvailableSelectOne}"/>

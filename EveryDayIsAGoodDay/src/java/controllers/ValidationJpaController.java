@@ -6,7 +6,6 @@
 package controllers;
 
 import controllers.exceptions.NonexistentEntityException;
-import controllers.exceptions.PreexistingEntityException;
 import controllers.exceptions.RollbackFailureException;
 import java.io.Serializable;
 import javax.persistence.Query;
@@ -15,7 +14,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import entities.Resolution;
 import entities.Validation;
-import entities.ValidationPK;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -38,24 +36,20 @@ public class ValidationJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Validation validation) throws PreexistingEntityException, RollbackFailureException, Exception {
-        if (validation.getValidationPK() == null) {
-            validation.setValidationPK(new ValidationPK());
-        }
-        validation.getValidationPK().setResolutionidResolution(validation.getResolution().getIdResolution());
+    public void create(Validation validation) throws RollbackFailureException, Exception {
         EntityManager em = null;
         try {
             utx.begin();
             em = getEntityManager();
-            Resolution resolution = validation.getResolution();
-            if (resolution != null) {
-                resolution = em.getReference(resolution.getClass(), resolution.getIdResolution());
-                validation.setResolution(resolution);
+            Resolution resolutionidResolution = validation.getResolutionidResolution();
+            if (resolutionidResolution != null) {
+                resolutionidResolution = em.getReference(resolutionidResolution.getClass(), resolutionidResolution.getIdResolution());
+                validation.setResolutionidResolution(resolutionidResolution);
             }
             em.persist(validation);
-            if (resolution != null) {
-                resolution.getValidationCollection().add(validation);
-                resolution = em.merge(resolution);
+            if (resolutionidResolution != null) {
+                resolutionidResolution.getValidationCollection().add(validation);
+                resolutionidResolution = em.merge(resolutionidResolution);
             }
             utx.commit();
         } catch (Exception ex) {
@@ -63,9 +57,6 @@ public class ValidationJpaController implements Serializable {
                 utx.rollback();
             } catch (Exception re) {
                 throw new RollbackFailureException("An error occurred attempting to roll back the transaction.", re);
-            }
-            if (findValidation(validation.getValidationPK()) != null) {
-                throw new PreexistingEntityException("Validation " + validation + " already exists.", ex);
             }
             throw ex;
         } finally {
@@ -76,26 +67,25 @@ public class ValidationJpaController implements Serializable {
     }
 
     public void edit(Validation validation) throws NonexistentEntityException, RollbackFailureException, Exception {
-        validation.getValidationPK().setResolutionidResolution(validation.getResolution().getIdResolution());
         EntityManager em = null;
         try {
             utx.begin();
             em = getEntityManager();
-            Validation persistentValidation = em.find(Validation.class, validation.getValidationPK());
-            Resolution resolutionOld = persistentValidation.getResolution();
-            Resolution resolutionNew = validation.getResolution();
-            if (resolutionNew != null) {
-                resolutionNew = em.getReference(resolutionNew.getClass(), resolutionNew.getIdResolution());
-                validation.setResolution(resolutionNew);
+            Validation persistentValidation = em.find(Validation.class, validation.getIdValidation());
+            Resolution resolutionidResolutionOld = persistentValidation.getResolutionidResolution();
+            Resolution resolutionidResolutionNew = validation.getResolutionidResolution();
+            if (resolutionidResolutionNew != null) {
+                resolutionidResolutionNew = em.getReference(resolutionidResolutionNew.getClass(), resolutionidResolutionNew.getIdResolution());
+                validation.setResolutionidResolution(resolutionidResolutionNew);
             }
             validation = em.merge(validation);
-            if (resolutionOld != null && !resolutionOld.equals(resolutionNew)) {
-                resolutionOld.getValidationCollection().remove(validation);
-                resolutionOld = em.merge(resolutionOld);
+            if (resolutionidResolutionOld != null && !resolutionidResolutionOld.equals(resolutionidResolutionNew)) {
+                resolutionidResolutionOld.getValidationCollection().remove(validation);
+                resolutionidResolutionOld = em.merge(resolutionidResolutionOld);
             }
-            if (resolutionNew != null && !resolutionNew.equals(resolutionOld)) {
-                resolutionNew.getValidationCollection().add(validation);
-                resolutionNew = em.merge(resolutionNew);
+            if (resolutionidResolutionNew != null && !resolutionidResolutionNew.equals(resolutionidResolutionOld)) {
+                resolutionidResolutionNew.getValidationCollection().add(validation);
+                resolutionidResolutionNew = em.merge(resolutionidResolutionNew);
             }
             utx.commit();
         } catch (Exception ex) {
@@ -106,7 +96,7 @@ public class ValidationJpaController implements Serializable {
             }
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                ValidationPK id = validation.getValidationPK();
+                Integer id = validation.getIdValidation();
                 if (findValidation(id) == null) {
                     throw new NonexistentEntityException("The validation with id " + id + " no longer exists.");
                 }
@@ -119,7 +109,7 @@ public class ValidationJpaController implements Serializable {
         }
     }
 
-    public void destroy(ValidationPK id) throws NonexistentEntityException, RollbackFailureException, Exception {
+    public void destroy(Integer id) throws NonexistentEntityException, RollbackFailureException, Exception {
         EntityManager em = null;
         try {
             utx.begin();
@@ -127,14 +117,14 @@ public class ValidationJpaController implements Serializable {
             Validation validation;
             try {
                 validation = em.getReference(Validation.class, id);
-                validation.getValidationPK();
+                validation.getIdValidation();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The validation with id " + id + " no longer exists.", enfe);
             }
-            Resolution resolution = validation.getResolution();
-            if (resolution != null) {
-                resolution.getValidationCollection().remove(validation);
-                resolution = em.merge(resolution);
+            Resolution resolutionidResolution = validation.getResolutionidResolution();
+            if (resolutionidResolution != null) {
+                resolutionidResolution.getValidationCollection().remove(validation);
+                resolutionidResolution = em.merge(resolutionidResolution);
             }
             em.remove(validation);
             utx.commit();
@@ -176,7 +166,7 @@ public class ValidationJpaController implements Serializable {
         }
     }
 
-    public Validation findValidation(ValidationPK id) {
+    public Validation findValidation(Integer id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(Validation.class, id);

@@ -15,12 +15,12 @@
             </h:panelGroup>
             <h:form>
                 <h:panelGrid columns="2">
-                    <h:outputLabel value="#{bundle.EditValidationLabel_validationPK_day}" for="validationPK_day" />
-                    <h:inputText id="validationPK_day" value="#{validationController.selected.validationPK.day}" title="#{bundle.EditValidationTitle_validationPK_day}" required="true" requiredMessage="#{bundle.EditValidationRequiredMessage_validationPK_day}">
+                    <h:outputLabel value="#{bundle.EditValidationLabel_day}" for="day" />
+                    <h:inputText id="day" value="#{validationController.selected.day}" title="#{bundle.EditValidationTitle_day}" required="true" requiredMessage="#{bundle.EditValidationRequiredMessage_day}">
                         <f:convertDateTime pattern="MM/dd/yyyy" />
                     </h:inputText>
-                    <h:outputLabel value="#{bundle.EditValidationLabel_resolution}" for="resolution" />
-                    <h:selectOneMenu id="resolution" value="#{validationController.selected.resolution}" title="#{bundle.EditValidationTitle_resolution}" required="true" requiredMessage="#{bundle.EditValidationRequiredMessage_resolution}">
+                    <h:outputLabel value="#{bundle.EditValidationLabel_resolutionidResolution}" for="resolutionidResolution" />
+                    <h:selectOneMenu id="resolutionidResolution" value="#{validationController.selected.resolutionidResolution}" title="#{bundle.EditValidationTitle_resolutionidResolution}" required="true" requiredMessage="#{bundle.EditValidationRequiredMessage_resolutionidResolution}">
                         <f:selectItems value="#{resolutionController.itemsAvailableSelectOne}"/>
                     </h:selectOneMenu>
                 </h:panelGrid>

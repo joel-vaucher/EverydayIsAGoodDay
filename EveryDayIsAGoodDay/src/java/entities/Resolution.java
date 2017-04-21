@@ -7,23 +7,19 @@ package entities;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -44,25 +40,22 @@ public class Resolution implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @NotNull
     @Column(name = "idResolution")
     private Integer idResolution;
     @Size(max = 45)
     @Column(name = "Description")
     private String description;
     @Column(name = "Year")
-    @Temporal(TemporalType.DATE)
-    private Date year;
-    @JoinTable(name = "resolution_has_tag", joinColumns = {
-        @JoinColumn(name = "Resolution_idResolution", referencedColumnName = "idResolution")}, inverseJoinColumns = {
-        @JoinColumn(name = "Tag_idTag", referencedColumnName = "idTag")})
-    @ManyToMany
-    private Collection<Tag> tagCollection;
+    private Integer year;
+    @JoinColumn(name = "Tag_idTag", referencedColumnName = "idTag")
+    @ManyToOne(optional = false)
+    private Tag tagidTag;
     @JoinColumn(name = "User_idUser", referencedColumnName = "idUser")
     @ManyToOne(optional = false)
     private User useridUser;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "resolution")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "resolutionidResolution")
     private Collection<Validation> validationCollection;
 
     public Resolution() {
@@ -88,21 +81,20 @@ public class Resolution implements Serializable {
         this.description = description;
     }
 
-    public Date getYear() {
+    public Integer getYear() {
         return year;
     }
 
-    public void setYear(Date year) {
+    public void setYear(Integer year) {
         this.year = year;
     }
 
-    @XmlTransient
-    public Collection<Tag> getTagCollection() {
-        return tagCollection;
+    public Tag getTagidTag() {
+        return tagidTag;
     }
 
-    public void setTagCollection(Collection<Tag> tagCollection) {
-        this.tagCollection = tagCollection;
+    public void setTagidTag(Tag tagidTag) {
+        this.tagidTag = tagidTag;
     }
 
     public User getUseridUser() {
