@@ -1,5 +1,6 @@
 package jsf;
 
+import entities.Role;
 import entities.User;
 import jsf.util.JsfUtil;
 import jsf.util.PaginationHelper;
@@ -7,6 +8,9 @@ import entities.UserFacade;
 
 import java.io.Serializable;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
@@ -17,6 +21,8 @@ import javax.faces.convert.FacesConverter;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 @Named("userController")
 @SessionScoped
@@ -28,6 +34,10 @@ public class UserController implements Serializable {
     private entities.UserFacade ejbFacade;
     private PaginationHelper pagination;
     private int selectedItemIndex;
+    @PersistenceContext(unitName = "EverydayIsAGoodDayPU")
+    private EntityManager em;
+    @Resource
+    private javax.transaction.UserTransaction utx;
 
     public UserController() {
     }
@@ -81,6 +91,8 @@ public class UserController implements Serializable {
 
     public String create() {
         try {
+            Role roleUser = em.find(Role.class, 2);
+            current.setRoleidRole(roleUser);
             getFacade().create(current);
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("UserCreated"));
             return prepareCreate();
@@ -230,6 +242,17 @@ public class UserController implements Serializable {
             }
         }
 
+    }
+
+    public void persist(Object object) {
+        try {
+            utx.begin();
+            em.persist(object);
+            utx.commit();
+        } catch (Exception e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", e);
+            throw new RuntimeException(e);
+        }
     }
 
 }

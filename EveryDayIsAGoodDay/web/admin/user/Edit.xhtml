@@ -19,10 +19,7 @@
                     <h:inputText id="name" value="#{userController.selected.name}" title="#{bundle.EditUserTitle_name}" />
                     <h:outputLabel value="#{bundle.EditUserLabel_password}" for="password" />
                     <h:inputText id="password" value="#{userController.selected.password}" title="#{bundle.EditUserTitle_password}" />
-                    <h:outputLabel value="#{bundle.EditUserLabel_roleidRole}" for="roleidRole" />
-                    <h:selectOneMenu id="roleidRole" value="#{userController.selected.roleidRole}" title="#{bundle.EditUserTitle_roleidRole}" required="true" requiredMessage="#{bundle.EditUserRequiredMessage_roleidRole}">
-                        <f:selectItems value="#{roleController.itemsAvailableSelectOne}"/>
-                    </h:selectOneMenu>
+                    
                 </h:panelGrid>
                 <h:commandLink action="#{userController.update}" value="#{bundle.EditUserSaveLink}"/>
                 <br />

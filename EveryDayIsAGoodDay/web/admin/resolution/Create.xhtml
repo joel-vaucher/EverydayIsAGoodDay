@@ -23,7 +23,7 @@
                     <h:selectOneMenu id="tagidTag" value="#{resolutionController.selected.tagidTag}" title="#{bundle.CreateResolutionTitle_tagidTag}" required="true" requiredMessage="#{bundle.CreateResolutionRequiredMessage_tagidTag}">
                         <f:selectItems value="#{tagController.itemsAvailableSelectOne}"/>
                     </h:selectOneMenu>
-                    <h:outputLabel value="#{bundle.CreateResolutionLabel_useridUser}" for="useridUser" />
+                   <h:outputLabel value="#{bundle.CreateResolutionLabel_useridUser}" for="useridUser" />
                     <h:selectOneMenu id="useridUser" value="#{resolutionController.selected.useridUser}" title="#{bundle.CreateResolutionTitle_useridUser}" required="true" requiredMessage="#{bundle.CreateResolutionRequiredMessage_useridUser}">
                         <f:selectItems value="#{userController.itemsAvailableSelectOne}"/>
                     </h:selectOneMenu>

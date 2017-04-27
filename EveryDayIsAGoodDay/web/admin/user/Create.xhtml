@@ -19,10 +19,7 @@
                     <h:inputText id="name" value="#{userController.selected.name}" title="#{bundle.CreateUserTitle_name}" />
                     <h:outputLabel value="#{bundle.CreateUserLabel_password}" for="password" />
                     <h:inputText id="password" value="#{userController.selected.password}" title="#{bundle.CreateUserTitle_password}" />
-                    <h:outputLabel value="#{bundle.CreateUserLabel_roleidRole}" for="roleidRole" />
-                    <h:selectOneMenu id="roleidRole" value="#{userController.selected.roleidRole}" title="#{bundle.CreateUserTitle_roleidRole}" required="true" requiredMessage="#{bundle.CreateUserRequiredMessage_roleidRole}">
-                        <f:selectItems value="#{roleController.itemsAvailableSelectOne}"/>
-                    </h:selectOneMenu>
+                   
                 </h:panelGrid>
                 <br />
                 <h:commandLink action="#{userController.create}" value="#{bundle.CreateUserSaveLink}" />

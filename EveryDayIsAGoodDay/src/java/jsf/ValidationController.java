@@ -1,5 +1,6 @@
 package jsf;
 
+import entities.Resolution;
 import entities.Validation;
 import jsf.util.JsfUtil;
 import jsf.util.PaginationHelper;
@@ -10,6 +11,7 @@ import java.util.ResourceBundle;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.bean.ManagedBean;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
@@ -19,6 +21,7 @@ import javax.faces.model.ListDataModel;
 import javax.faces.model.SelectItem;
 
 @Named("validationController")
+@ManagedBean
 @SessionScoped
 public class ValidationController implements Serializable {
 
@@ -30,6 +33,7 @@ public class ValidationController implements Serializable {
     private int selectedItemIndex;
 
     public ValidationController() {
+        this.ejbFacade = new entities.ValidationFacade();
     }
 
     public Validation getSelected() {
@@ -86,6 +90,7 @@ public class ValidationController implements Serializable {
             return prepareCreate();
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+            System.err.println(e);
             return null;
         }
     }

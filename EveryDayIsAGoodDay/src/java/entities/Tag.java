@@ -101,7 +101,7 @@ public class Tag implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.Tag[ idTag=" + idTag + " ]";
+        return name;
     }
     
 }

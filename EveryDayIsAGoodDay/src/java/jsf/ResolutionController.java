@@ -1,12 +1,18 @@
 package jsf;
 
+import controllers.ValidationJpaController;
 import entities.Resolution;
 import jsf.util.JsfUtil;
 import jsf.util.PaginationHelper;
 import entities.ResolutionFacade;
+import entities.Validation;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
@@ -17,6 +23,8 @@ import javax.faces.convert.FacesConverter;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 @Named("resolutionController")
 @SessionScoped
@@ -28,6 +36,10 @@ public class ResolutionController implements Serializable {
     private entities.ResolutionFacade ejbFacade;
     private PaginationHelper pagination;
     private int selectedItemIndex;
+    @PersistenceContext(unitName = "EverydayIsAGoodDayPU")
+    private EntityManager em;
+    @Resource
+    private javax.transaction.UserTransaction utx;
 
     public ResolutionController() {
     }
@@ -89,6 +101,48 @@ public class ResolutionController implements Serializable {
             return null;
         }
     }
+    
+    public String createValidation(){
+        ValidationJpaController valController = new ValidationJpaController(utx, em.getEntityManagerFactory());
+        Validation val = new Validation();
+        val.setResolutionidResolution(current);
+        try {
+            valController.create(val);
+        } catch (Exception e) {
+            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+        }
+        return "List";
+    }
+    
+    public String resolutionValid(){
+        if(current.isResolutionValid()){
+            return "Valide";
+        }else{
+            return "Non valide";
+        }
+    }
+    
+    
+    
+    public void setResolutionValidForDebug(){
+        ValidationJpaController valController = new ValidationJpaController(utx, em.getEntityManagerFactory());
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(current.getYear(), 0, 1, 0, 0, 0);
+        while(cal.before(Calendar.getInstance())){
+            Validation val = new Validation();
+            val.setResolutionidResolution(current);
+            val.setDay(cal.getTime());
+            try {
+                valController.create(val);
+            } catch (Exception e) {
+                JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+            }
+            cal.add(Calendar.DATE, 1);
+        }
+    }
+    
+    
 
     public String prepareEdit() {
         current = (Resolution) getItems().getRowData();
@@ -230,6 +284,17 @@ public class ResolutionController implements Serializable {
             }
         }
 
+    }
+
+    public void persist(Object object) {
+        try {
+            utx.begin();
+            em.persist(object);
+            utx.commit();
+        } catch (Exception e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", e);
+            throw new RuntimeException(e);
+        }
     }
 
 }

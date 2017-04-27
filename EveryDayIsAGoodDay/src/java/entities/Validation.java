@@ -6,6 +6,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -52,10 +53,12 @@ public class Validation implements Serializable {
     private Resolution resolutionidResolution;
 
     public Validation() {
+        day = Date.from(Instant.now());
     }
 
     public Validation(Integer idValidation) {
         this.idValidation = idValidation;
+        day = Date.from(Instant.now());
     }
 
     public Validation(Integer idValidation, Date day) {

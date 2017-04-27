@@ -26,7 +26,14 @@
                     <h:outputText value="#{bundle.ViewResolutionLabel_useridUser}"/>
                     <h:outputText value="#{resolutionController.selected.useridUser}" title="#{bundle.ViewResolutionTitle_useridUser}"/>
                 </h:panelGrid>
+                
                 <br />
+                
+                <h:commandButton action="#{resolutionController.createValidation}" value="Valider" />
+                <h:commandButton action="#{resolutionController.setResolutionValidForDebug}" value="Valider tous les jours" />
+
+                <br />
+                
                 <h:commandLink action="#{resolutionController.destroyAndView}" value="#{bundle.ViewResolutionDestroyLink}"/>
                 <br />
                 <br />

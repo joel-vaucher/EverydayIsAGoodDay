@@ -15,10 +15,10 @@
             </h:panelGroup>
             <h:form>
                 <h:panelGrid columns="2">
-                    <h:outputLabel value="#{bundle.CreateValidationLabel_day}" for="day" />
+                    <!--<h:outputLabel value="#{bundle.CreateValidationLabel_day}" for="day" />
                     <h:inputText id="day" value="#{validationController.selected.day}" title="#{bundle.CreateValidationTitle_day}" required="true" requiredMessage="#{bundle.CreateValidationRequiredMessage_day}">
                         <f:convertDateTime pattern="MM/dd/yyyy" />
-                    </h:inputText>
+                    </h:inputText>-->
                     <h:outputLabel value="#{bundle.CreateValidationLabel_resolutionidResolution}" for="resolutionidResolution" />
                     <h:selectOneMenu id="resolutionidResolution" value="#{validationController.selected.resolutionidResolution}" title="#{bundle.CreateValidationTitle_resolutionidResolution}" required="true" requiredMessage="#{bundle.CreateValidationRequiredMessage_resolutionidResolution}">
                         <f:selectItems value="#{resolutionController.itemsAvailableSelectOne}"/>

@@ -49,10 +49,14 @@ public class UserJpaController implements Serializable {
             utx.begin();
             em = getEntityManager();
             Role roleidRole = user.getRoleidRole();
-            if (roleidRole != null) {
+           /* if (roleidRole != null) {
                 roleidRole = em.getReference(roleidRole.getClass(), roleidRole.getIdRole());
                 user.setRoleidRole(roleidRole);
-            }
+            }*/
+            roleidRole = em.find(roleidRole.getClass(), 2);
+            user.setRoleidRole(roleidRole);
+            
+                
             Collection<Resolution> attachedResolutionCollection = new ArrayList<Resolution>();
             for (Resolution resolutionCollectionResolutionToAttach : user.getResolutionCollection()) {
                 resolutionCollectionResolutionToAttach = em.getReference(resolutionCollectionResolutionToAttach.getClass(), resolutionCollectionResolutionToAttach.getIdResolution());

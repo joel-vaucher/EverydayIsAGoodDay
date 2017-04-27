@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.ListValidationTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+        <h:form styleClass="jsfcrud_list_form">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:outputText escape="false" value="#{bundle.ListValidationEmpty}" rendered="#{validationController.items.rowCount == 0}"/>
+            <h:panelGroup rendered="#{validationController.items.rowCount > 0}">
+                <h:outputText value="#{validationController.pagination.pageFirstItem + 1}..#{validationController.pagination.pageLastItem + 1}/#{validationController.pagination.itemsCount}"/>&nbsp;
+                <h:commandLink action="#{validationController.previous}" value="#{bundle.Previous} #{validationController.pagination.pageSize}" rendered="#{validationController.pagination.hasPreviousPage}"/>&nbsp;
+                <h:commandLink action="#{validationController.next}" value="#{bundle.Next} #{validationController.pagination.pageSize}" rendered="#{validationController.pagination.hasNextPage}"/>&nbsp;
+                <h:dataTable value="#{validationController.items}" var="item" border="0" cellpadding="2" cellspacing="0" rowClasses="jsfcrud_odd_row,jsfcrud_even_row" rules="all" style="border:solid 1px">
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle.ListValidationTitle_idValidation}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idValidation}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle.ListValidationTitle_day}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.day}">
+                            <f:convertDateTime pattern="MM/dd/yyyy" />
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle.ListValidationTitle_resolutionidResolution}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.resolutionidResolution}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;"/>
+                        </f:facet>
+                        <h:commandLink action="#{validationController.prepareView}" value="#{bundle.ListValidationViewLink}"/>
+                        <h:outputText value=" "/>
+                        <h:commandLink action="#{validationController.destroy}" value="#{bundle.ListValidationDestroyLink}"/>
+                    </h:column>
+                </h:dataTable>
+            </h:panelGroup>
+            <br />
+            <h:commandLink action="#{validationController.prepareCreate}" value="#{bundle.ListValidationCreateLink}"/>
+            <br />
+            <br />
+            <h:link outcome="/index" value="#{bundle.ListValidationIndexLink}"/>
+        </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

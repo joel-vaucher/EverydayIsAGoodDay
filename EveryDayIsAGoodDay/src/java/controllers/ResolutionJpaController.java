@@ -269,6 +269,19 @@ public class ResolutionJpaController implements Serializable {
         }
     }
 
+    public List<Resolution> findResolutions(User user) {
+        EntityManager em = getEntityManager();
+        List<Resolution> resolutions = findResolutionEntities(true, -1, -1);
+
+        for (int i = 0; i < resolutions.size(); i++) {
+            if (!resolutions.get(i).getUseridUser().equals(user)) {
+                resolutions.remove(i);
+                i--;
+            }
+        }
+        return resolutions;
+    }
+
     public int getResolutionCount() {
         EntityManager em = getEntityManager();
         try {
@@ -281,5 +294,5 @@ public class ResolutionJpaController implements Serializable {
             em.close();
         }
     }
-    
+
 }

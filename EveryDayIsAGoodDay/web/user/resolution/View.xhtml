@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.ViewResolutionTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputText value="#{bundle.ViewResolutionLabel_idResolution}"/>
+                    <h:outputText value="#{resolutionController.selected.idResolution}" title="#{bundle.ViewResolutionTitle_idResolution}"/>
+                    <h:outputText value="#{bundle.ViewResolutionLabel_description}"/>
+                    <h:outputText value="#{resolutionController.selected.description}" title="#{bundle.ViewResolutionTitle_description}"/>
+                    <h:outputText value="#{bundle.ViewResolutionLabel_year}"/>
+                    <h:outputText value="#{resolutionController.selected.year}" title="#{bundle.ViewResolutionTitle_year}"/>
+                    <h:outputText value="#{bundle.ViewResolutionLabel_tagidTag}"/>
+                    <h:outputText value="#{resolutionController.selected.tagidTag}" title="#{bundle.ViewResolutionTitle_tagidTag}"/>
+                    <h:outputText value="#{bundle.ViewResolutionLabel_useridUser}"/>
+                    <h:outputText value="#{resolutionController.selected.useridUser}" title="#{bundle.ViewResolutionTitle_useridUser}"/>
+                </h:panelGrid>
+                
+                <br />
+                
+                <h:commandButton action="#{resolutionController.createValidation}" value="Valider" />
+                <h:commandButton action="#{resolutionController.setResolutionValidForDebug}" value="Valider tous les jours" />
+                <h:outputText value="   #{resolutionController.resolutionValid()}"/>
+
+                <br />
+                
+                <h:commandLink action="#{resolutionController.destroyAndView}" value="#{bundle.ViewResolutionDestroyLink}"/>
+                <br />
+                <br />
+                <h:link outcome="Edit" value="#{bundle.ViewResolutionEditLink}"/>
+                <br />
+                <h:commandLink action="#{resolutionController.prepareCreate}" value="#{bundle.ViewResolutionCreateLink}" />
+                <br />
+                <h:commandLink action="#{resolutionController.prepareList}" value="#{bundle.ViewResolutionShowAllLink}"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{bundle.ViewResolutionIndexLink}"/>
+
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

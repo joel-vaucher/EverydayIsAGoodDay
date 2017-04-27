@@ -6,7 +6,10 @@
 package entities;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -57,7 +60,6 @@ public class Resolution implements Serializable {
     private User useridUser;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "resolutionidResolution")
     private Collection<Validation> validationCollection;
-
     public Resolution() {
     }
 
@@ -133,10 +135,32 @@ public class Resolution implements Serializable {
         }
         return true;
     }
-
+    
     @Override
     public String toString() {
         return "entities.Resolution[ idResolution=" + idResolution + " ]";
     }
     
+    public boolean isResolutionValid(){
+        
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, 0, 1, 0, 0, 0);
+        while(cal.before(Calendar.getInstance())){
+            if(!isValidAt(cal.getTime())){
+                return false;
+            }
+            cal.add(Calendar.DATE, 1);
+        }
+        return true;
+    }
+    
+    private boolean isValidAt(Date date){
+        for(Validation val : validationCollection){
+            if(val.getDay().getYear() == date.getYear() &&
+               val.getDay().getMonth()== date.getMonth() &&
+               val.getDay().getDay()== date.getDay())
+                return true;
+        }
+        return false;
+    }
 }
